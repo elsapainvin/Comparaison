@@ -1,0 +1,50 @@
+import numpy as np
+from scipy.signal import butter, filtfilt
+import matplotlib.pyplot as plt
+
+def lire_derniere_colonne(nom_fichier):
+    with open(nom_fichier, 'r') as fichier:
+        lignes = fichier.readlines()
+
+    derniere_colonne = []
+
+    for ligne in lignes[lignes.index('endheader\n')+1:]:
+        valeurs = ligne.strip().split()
+        if valeurs[-1].replace('.', '', 1).replace('-', '', 1).isdigit():
+            derniere_colonne.append(float(valeurs[-1]))
+
+    return derniere_colonne
+
+def butter_lowpass_filter(data, cutoff, fs, order=4):
+    nyquist = 0.5 * fs
+    normal_cutoff = cutoff / nyquist
+    b, a = butter(order, normal_cutoff, btype='low', analog=False)
+    return filtfilt(b, a, data)
+
+# Nom du fichier à traiter
+nom_fichier = 'angle_genoux'
+
+# Lecture des données depuis le fichier
+data = lire_derniere_colonne(nom_fichier)
+
+# Fréquence d'échantillonnage (en Hz)
+fs = 100  
+
+# Temps de 0 à la durée totale des données
+t = np.arange(len(data)) / fs  
+
+# Paramètres du filtre
+cutoff_freq = 30
+
+# Filtrage
+filtered_data = butter_lowpass_filter(data, cutoff_freq, fs)
+
+# Tracer les données originales et filtrées
+plt.figure()
+plt.plot(t, data, 'b-', label='Données originales')
+plt.plot(t, filtered_data, 'r-', linewidth=2, label='Données filtrées')
+plt.xlabel('Temps [s]')
+plt.ylabel('Amplitude')
+plt.legend()
+plt.grid()
+plt.show()
