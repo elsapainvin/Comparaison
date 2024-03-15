@@ -1,0 +1,21 @@
+def lire_deuxieme_colonne(nom_fichier):
+    # Ouvrir le fichier en mode lecture
+    with open(nom_fichier, 'r') as fichier:
+        lignes = fichier.readlines()
+
+    # Initialiser une liste vide pour stocker les valeurs de la deuxième colonne
+    deuxieme_colonne = []
+
+    # Trouver l'index où se termine l'en-tête
+    index_endheader = lignes.index('endheader\n')
+
+    # Parcourir les lignes du fichier à partir de l'index après 'endheader'
+    for ligne in lignes[index_endheader+1:]:
+        # Fractionner la ligne en fonction des tabulations
+        valeurs = ligne.strip().split()
+        # Vérifier si la liste de valeurs contient au moins 2 éléments
+        if len(valeurs) >= 2:
+            # Si c'est le cas, convertir la deuxième valeur en float et l'ajouter à la liste
+            deuxieme_colonne.append(float(valeurs[1]))
+
+    return deuxieme_colonne
