@@ -1,0 +1,71 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from fastdtw import fastdtw
+
+data_em = np.genfromtxt("jG_emma", delimiter="\t", skip_header=7)
+data_lu = np.genfromtxt("jG_lucile", delimiter="\t", skip_header=7)
+
+
+# Fonction pour calculer le DTW et obtenir les indices du chemin d'alignement
+def calculate_dtw(seq1, seq2):
+  distance, path = fastdtw(seq1, seq2, 200)
+  return distance, path
+
+
+# Calculer le DTW
+distance, path = calculate_dtw(data_em, data_lu)
+
+# Gérer les différentes versions de la sortie de fastdtw
+if isinstance(path, tuple):
+  path = path[1]
+
+# Extraire les indices du chemin d'alignement
+indices_seq1, indices_seq2 = zip(*path)
+
+plt.plot(data_em[:, 1], data_em[:, 2], label='data_1', marker='o')
+plt.plot(data_lu[:, 1], data_lu[:, 2], label='data_2', marker='o')
+
+plt.plot([data_em[indices_seq1, 1], data_lu[indices_seq2, 1]],
+         [data_em[indices_seq1, 2], data_lu[indices_seq2, 2]], 'k--')
+plt.xlabel('time (s)')
+plt.ylabel('knee_angle_l')
+plt.title('Changes in left knee angle during acquisition')
+plt.legend()
+
+plt.figure(2)
+# Réalignement des séquences en utilisant le chemin d'alignement
+aligned_data_em = np.array([data_em[i] for i, _ in path])
+
+# Tracer les séquences originales
+plt.plot(data_em[:, 1], data_em[:, 2], label='Data_1 (Before DTW)')
+plt.plot(data_lu[:, 1], data_lu[:, 2], label='Data_2 (Before DTW)')
+# recalage data_em sur time data_lu
+plt.plot(data_lu[indices_seq2, 1],
+         aligned_data_em[:, 2],
+         label='Adjusted Data_1 after DTW',
+         linestyle='--')
+
+# légende
+plt.legend(loc='lower right', fontsize='small')
+plt.xlabel('time')
+plt.ylabel('knee_angle_l')
+plt.title('Curves before and after recalibration by DTW')
+
+
+# Créer une matrice de chemin d'alignement avec des zéros
+alignment_matrix = np.zeros((len(data_em), len(data_lu)))
+
+# Mettre à jour la matrice avec les valeurs de chemin d'alignement
+for i, j in path:
+    alignment_matrix[i, j] = 1  # Mettre à 1 pour indiquer un point d'alignement
+
+# Afficher la matrice de chemin (s fct de t ou qqch comme ca)
+plt.figure(3)
+plt.imshow(alignment_matrix, cmap='gray', aspect='auto')
+plt.xlabel('Indices de data_lu')
+plt.ylabel('Indices de data_em')
+plt.title('Matrice de chemin d\'alignement')
+plt.colorbar(label='Point d\'alignement')
+plt.show()
+
+# on a mis em sur lu, ie data_1 sur data_2
