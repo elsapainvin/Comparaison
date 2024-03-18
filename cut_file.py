@@ -61,9 +61,9 @@ def close_window(root):
   
 #regroupe les commandes du bouton entrer: couper le fichier et fermer la fenetre 
 def bouton_entrer(nom_fichier, begin_entry, end_entry, root):
-    cut_data = cut_file(nom_fichier, begin_entry, end_entry)
+    global time,values
+    time,values = cut_file(nom_fichier, begin_entry, end_entry)
     close_window(root)
-    return cut_data
    
 
 def debut_fin_mvt(nom_fichier):
@@ -98,5 +98,6 @@ def debut_fin_mvt(nom_fichier):
     root.mainloop()
 
 #def variables
+time,values=[],[]
 nom_fichier="C:/Users/emmad/Documents/2A/PI13/acqui/Lucile2"
 debut_fin_mvt(nom_fichier)
