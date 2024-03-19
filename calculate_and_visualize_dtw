@@ -2,10 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from fastdtw import fastdtw
 
-
-
-
-
 """""""""""
     DTW
 """""""""""
@@ -20,18 +16,8 @@ def calculate_and_visualize_dtw(seq1, seq2):
     # Extraire les indices du chemin d'alignement
     indices_seq1, indices_seq2 = zip(*path)
     
-    # Tracer les données originales
-    plt.figure(figsize=(12, 6))
-    plt.subplot(1, 2, 1)
-    plt.plot(seq1[:, 1], seq1[:, 2], label='Séquence 1', marker='o')
-    plt.plot(seq2[:, 1], seq2[:, 2], label='Séquence 2', marker='o')
-    plt.xlabel('Temps (s)')
-    plt.ylabel('Angle du genou gauche')
-    plt.title('Données originales')
-    plt.legend()
     
     # Tracer le résultat du DTW
-    plt.subplot(1, 2, 2)
     plt.plot(seq1[:, 1], seq1[:, 2], label='Séquence 1', marker='o')
     plt.plot(seq2[:, 1], seq2[:, 2], label='Séquence 2', marker='o')
     plt.plot(seq2[indices_seq2, 1], seq1[indices_seq1, 2], 'k--', label='Chemin d\'alignement')
@@ -56,26 +42,52 @@ Création de la Matrice
 def create_alignment_matrix(path, data_em, data_lu):
     # Créer une matrice de chemin d'alignement avec des zéros
     alignment_matrix = np.zeros((len(data_em), len(data_lu)))
-
     # Mettre à jour la matrice avec les valeurs de chemin d'alignement
     for i, j in path:
-        alignment_matrix[i, j] = 1  # Mettre à 1 pour indiquer un point d'alignement
+        alignment_matrix[i, j] = 1
+        
+        
+    # Zone d'acceptabilité temporel
+    x_values = np.arange(max(len(data_em), len(data_lu)))
+    marge = max(len(data_em), len(data_lu)) * 0.05  # Par exemple, 5% de la longueur maximale
+    lower_bound = x_values - marge
+    upper_bound = x_values + marge
 
+    
     # Afficher la matrice de chemin d'alignement
     plt.figure(figsize=(10, 6), facecolor='white')
     plt.imshow(alignment_matrix, cmap='gray_r', aspect='auto', vmin=0, vmax=1)
+    # Afficher la droite x=y en bleu
+    plt.plot(x_values, x_values, color='blue', linewidth=2)
+    # Remplir la zone d'acceptabilité en vert 
+    plt.fill_between(x_values, lower_bound, upper_bound, color='green', alpha=0.5)
+    plt.fill_between(x_values, lower_bound, upper_bound, color='white', alpha=0.5) 
     plt.xlabel('Temps de la séquence 2')
     plt.ylabel('Temps de la séquence 1')
     plt.title('Matrice de chemin d\'alignement')
     plt.colorbar(label='Alignement')
     plt.show()
 
+    return alignment_matrix
 
 
 
+"""""""""""""""""""""""""""""""""
+Intersection avec la droite x=y
+"""""""""""""""""""""""""""""""""
 
+def find_intersection_indices(alignment_matrix, data_em, data_lu):
+    indices_intersection = []
 
-
+    # Parcourir les points rouges pour trouver les indices correspondants
+    for i in range(len(data_em)):
+        for j in range(len(data_lu)):
+            if alignment_matrix[i, j] == 1 and i == j:  # Vérifiez si le point d'alignement est sur la diagonale x=y
+                indice_data_em = i  # Indice dans data_em
+                indice_data_lu = j  # Indice dans data_lu
+                indices_intersection.append((indice_data_em, indice_data_lu))
+    
+    return indices_intersection
 
 
 
@@ -92,3 +104,4 @@ path, iun, ideux = calculate_and_visualize_dtw(data_em, data_lu)
 
 # Matrice
 create_alignment_matrix(path, data_em, data_lu)
+
