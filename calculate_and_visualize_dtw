@@ -18,8 +18,8 @@ def calculate_and_visualize_dtw(seq1, seq2):
     
     
     # Tracer le résultat du DTW
-    plt.plot(seq1[:, 1], seq1[:, 2], label='Séquence 1', marker='o')
-    plt.plot(seq2[:, 1], seq2[:, 2], label='Séquence 2', marker='o')
+    plt.plot(seq1[:, 1], seq1[:, 2], label='Séquence 1', linestyle='-')
+    plt.plot(seq2[:, 1], seq2[:, 2], label='Séquence 2', linestyle='-')
     plt.plot(seq2[indices_seq2, 1], seq1[indices_seq1, 2], 'k--', label='Chemin d\'alignement')
     plt.xlabel('Temps (s)')
     plt.ylabel('Angle du genou gauche')
