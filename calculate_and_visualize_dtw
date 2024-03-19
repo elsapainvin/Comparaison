@@ -5,6 +5,10 @@ from fastdtw import fastdtw
 
 
 
+
+"""""""""""
+    DTW
+"""""""""""
 def calculate_and_visualize_dtw(seq1, seq2):
     # Calculer le DTW
     distance, path = fastdtw(seq1, seq2, 200)
@@ -39,12 +43,52 @@ def calculate_and_visualize_dtw(seq1, seq2):
     plt.tight_layout()
     plt.show()
     
+    return path, indices_seq1, indices_seq2
 
     
+
+
+"""""""""""""""""""""""
+Création de la Matrice
+"""""""""""""""""""""""
+
+
+def create_alignment_matrix(path, data_em, data_lu):
+    # Créer une matrice de chemin d'alignement avec des zéros
+    alignment_matrix = np.zeros((len(data_em), len(data_lu)))
+
+    # Mettre à jour la matrice avec les valeurs de chemin d'alignement
+    for i, j in path:
+        alignment_matrix[i, j] = 1  # Mettre à 1 pour indiquer un point d'alignement
+
+    # Afficher la matrice de chemin d'alignement
+    plt.figure(figsize=(10, 6), facecolor='white')
+    plt.imshow(alignment_matrix, cmap='gray_r', aspect='auto', vmin=0, vmax=1)
+    plt.xlabel('Temps de la séquence 2')
+    plt.ylabel('Temps de la séquence 1')
+    plt.title('Matrice de chemin d\'alignement')
+    plt.colorbar(label='Alignement')
+    plt.show()
+
+
+
+
+
+
+
+
+
+
+
 
 # Charger les données
 data_em = np.genfromtxt("jG_emma.sto", delimiter="\t", skip_header=7)
 data_lu = np.genfromtxt("jG_lucile.sto", delimiter="\t", skip_header=7)
 
-# Appeler la fonction
-calculate_and_visualize_dtw(data_em, data_lu)
+
+
+# DTW
+path, iun, ideux = calculate_and_visualize_dtw(data_em, data_lu)
+
+# Matrice
+create_alignment_matrix(path, data_em, data_lu)
