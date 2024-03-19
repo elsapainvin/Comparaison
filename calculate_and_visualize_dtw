@@ -1,0 +1,50 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from fastdtw import fastdtw
+
+
+
+
+def calculate_and_visualize_dtw(seq1, seq2):
+    # Calculer le DTW
+    distance, path = fastdtw(seq1, seq2, 200)
+    
+    # Gérer les différentes versions de la sortie de fastdtw
+    if isinstance(path, tuple):
+        path = path[1]
+    
+    # Extraire les indices du chemin d'alignement
+    indices_seq1, indices_seq2 = zip(*path)
+    
+    # Tracer les données originales
+    plt.figure(figsize=(12, 6))
+    plt.subplot(1, 2, 1)
+    plt.plot(seq1[:, 1], seq1[:, 2], label='Séquence 1', marker='o')
+    plt.plot(seq2[:, 1], seq2[:, 2], label='Séquence 2', marker='o')
+    plt.xlabel('Temps (s)')
+    plt.ylabel('Angle du genou gauche')
+    plt.title('Données originales')
+    plt.legend()
+    
+    # Tracer le résultat du DTW
+    plt.subplot(1, 2, 2)
+    plt.plot(seq1[:, 1], seq1[:, 2], label='Séquence 1', marker='o')
+    plt.plot(seq2[:, 1], seq2[:, 2], label='Séquence 2', marker='o')
+    plt.plot(seq2[indices_seq2, 1], seq1[indices_seq1, 2], 'k--', label='Chemin d\'alignement')
+    plt.xlabel('Temps (s)')
+    plt.ylabel('Angle du genou gauche')
+    plt.title('Résultat du DTW')
+    plt.legend()
+    
+    plt.tight_layout()
+    plt.show()
+    
+
+    
+
+# Charger les données
+data_em = np.genfromtxt("jG_emma.sto", delimiter="\t", skip_header=7)
+data_lu = np.genfromtxt("jG_lucile.sto", delimiter="\t", skip_header=7)
+
+# Appeler la fonction
+calculate_and_visualize_dtw(data_em, data_lu)
