@@ -1,0 +1,68 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+
+
+
+
+"""""""""""
+Zone
+"""""""""""
+
+
+# Fonction pour calculer les bornes inférieure et supérieure de la zone d'acceptabilité
+def zone(data, taille_zone):
+    borne_inferieure = np.array(data) - taille_zone
+    borne_superieure = np.array(data) + taille_zone
+    return borne_inferieure, borne_superieure
+
+
+
+
+"""""""""""
+Fit
+"""""""""""
+# Fonction pour vérifier si la courbe est dans la zone d'acceptabilité
+def est_dans_la_zone(borne_inf, borne_sup, courbe_a_verifier):
+    est_dans_zone = (courbe_a_verifier >= borne_inf) & (courbe_a_verifier <= borne_sup)
+    points_en_dehors = []
+    
+    for i, point in enumerate(courbe_a_verifier):
+        if not est_dans_zone[i]:
+            points_en_dehors.append((i, point))
+            
+    return points_en_dehors
+
+
+
+
+
+
+
+#data
+add = [-2.38741643, -2.34966036, -2.402355666666667, -2.4056285600000002, -2.4174561760000004, -2.4096658450000006, -2.4157833500000003]
+courbe_a_verifier = [-2.38741643, -2.34966036, -2.702355666666667, -2.7056285600000002, -2.4174561760000004, -2.4096658450000006, -2.4157833500000003]
+
+
+borne_inf, borne_sup = zone(add, 0.1)
+points_en_dehors = est_dans_la_zone(borne_inf, borne_sup, courbe_a_verifier)
+
+
+
+plt.figure()
+plt.plot(add)
+plt.plot(courbe_a_verifier, alpha=0.5)
+plt.fill_between(range(len(add)), borne_inf, borne_sup, color='blue', alpha=0.5)
+plt.fill_between(range(len(add)), borne_inf, borne_sup, color='white', alpha=0.5)
+
+
+
+# Mise en forme de l'affichage
+plt.title("Zone d'acceptabilité autour de la moyenne")
+plt.xlabel("Index")
+plt.ylabel("Valeurs")
+plt.grid(True)
+plt.show()
+
+print("Points en dehors de la zone d'acceptabilité :", points_en_dehors)
